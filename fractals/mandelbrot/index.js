@@ -26,11 +26,18 @@
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
+
+//* x, y - screen coordinates of thepoint currently being iterated
+//* cx, cy - coordinate of the point currently being iterated on a complex plane. (-2, -2) is in bottom left corner and (2, 2) is in upper right
 for (let x = 0; x < 1000; x++) {
     for (let y = 0; y < 1000; y++) {
         let i = 0;
+
+        // Convert screen coords into a complex number
         const cx = -2 + x / 300;
         const cy = -2 + y / 300;
+
+        // Z0 = 0
         let zx = 0;
         let zy = 0;
 
@@ -39,6 +46,7 @@ for (let x = 0; x < 1000; x++) {
             zx = zx * zx - zy * zy + cx;
             zy = 2 * xt + cy;
             i++;
+        // Iterate by the formula until rach 255 iterations of the absolute value is > 4
         } while (i < 255 && (zx * zx + zy * zy) < 4);
 
         const color = i.toString(16);
