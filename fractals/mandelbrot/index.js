@@ -25,6 +25,29 @@
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
+const palette = [];
+
+for (let x = 0; x < 256; x++) {
+    let r = 0, g = 0, b = 0;
+    if (x < 85) {
+        r = x * 7;
+    }
+    if (x >= 85 && x < 171) {
+        g = 10 * (x -84);
+    }
+    if (x >= 171) {
+        b = 2 * (x - 170);
+    }
+    r = r.toString(16);
+    g = g.toString(16);
+    b = b.toString(16);
+
+    r = r.length === 1 ? "0" + r : r;
+    g = g.length === 1 ? "0" + g : g;
+    b = b.length === 1 ? "0" + b : b;
+
+    palette.push(`#${r}${g}${b}`);
+}
 
 
 //* x, y - screen coordinates of thepoint currently being iterated
@@ -52,7 +75,7 @@ for (let x = 0; x < 1000; x++) {
         const color = i.toString(16);
         context.beginPath();
         context.rect(x, y , 1  , 1);
-        context.fillStyle = `#${color}${color}${color}`;
+        context.fillStyle = palette[i];
         context.fill();
     }
 }
