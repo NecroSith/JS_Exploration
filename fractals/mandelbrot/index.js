@@ -26,56 +26,86 @@
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 const palette = [];
+let xmin = -2,
+    ymin = -2,
+    scale = 300, //* New variables represent the bottom left corner of the plotted area and scale
+    iterations = 1000;
 
-for (let x = 0; x < 256; x++) {
-    let r = 0, g = 0, b = 0;
-    if (x < 85) {
-        r = x * 7;
-    }
-    if (x >= 85 && x < 171) {
-        g = 10 * (x -84);
-    }
-    if (x >= 171) {
-        b = 2 * (x - 170);
-    }
-    r = r.toString(16);
-    g = g.toString(16);
-    b = b.toString(16);
+canvas.addEventListener('click', zoom, false);
 
-    r = r.length === 1 ? "0" + r : r;
-    g = g.length === 1 ? "0" + g : g;
-    b = b.length === 1 ? "0" + b : b;
+getColorPalette();
+drawMandelbrot();
 
-    palette.push(`#${r}${g}${b}`);
+function zoom(e) {
+    // console.log(e);
+    
+    xmin = xmin + Math.floor(e.pageX/2) / scale;
+    ymin = Math.floor(e.pageY / 2) / scale + ymin;
+    scale = scale * 1.5;
+    console.log(scale);
+    
+    // iterations = iterations * 2;
+    // console.log(e.pageX, e.pageY);
+    
+    // console.log(xmin);
+    // console.log(ymin);
+    
+    getColorPalette();
+    drawMandelbrot();
 }
 
+function getColorPalette() {
+    for (let x = 0; x < 256; x++) {
+        let r = 0, g = 0, b = 0;
+        if (x < 85) {
+            r = x * 3;
+        }
+        if (x >= 85 && x < 171) {
+            g = 3 * (x - 84);
+        }
+        if (x >= 171) {
+            b = 3 * (x - 170);
+        }
+        r = r.toString(16);
+        g = g.toString(16);
+        b = b.toString(16);
+    
+        r = r.length === 1 ? "0" + r : r;
+        g = g.length === 1 ? "0" + g : g;
+        b = b.length === 1 ? "0" + b : b;
+    
+        palette.push(`#${r}${g}${b}`);
+    }
+}
 
-//* x, y - screen coordinates of thepoint currently being iterated
-//* cx, cy - coordinate of the point currently being iterated on a complex plane. (-2, -2) is in bottom left corner and (2, 2) is in upper right
-for (let x = 0; x < 1000; x++) {
-    for (let y = 0; y < 1000; y++) {
-        let i = 0;
+function drawMandelbrot() {
+    //* x, y - screen coordinates of thepoint currently being iterated
+    //* cx, cy - coordinate of the point currently being iterated on a complex plane. (-2, -2) is in bottom left corner and (2, 2) is in upper right
+    for (let x = 0; x < iterations; x++) {
+        for (let y = 0; y < iterations; y++) {
+            let i = 0;
 
-        // Convert screen coords into a complex number
-        const cx = -2 + x / 300;
-        const cy = -2 + y / 300;
+            // Convert screen coords into a complex number
+            const cx = xmin + x / scale;
+            const cy = ymin + y / scale;
 
-        // Z0 = 0
-        let zx = 0;
-        let zy = 0;
+            // Z0 = 0
+            let zx = 0;
+            let zy = 0;
 
-        do {
-            const xt = zx * zy;
-            zx = zx * zx - zy * zy + cx;
-            zy = 2 * xt + cy;
-            i++;
-        // Iterate by the formula until rach 255 iterations of the absolute value is > 4
-        } while (i < 255 && (zx * zx + zy * zy) < 4);
+            do {
+                const xt = zx * zy;
+                zx = zx * zx - zy * zy + cx;
+                zy = 2 * xt + cy;
+                i++;
+            // Iterate by the formula until rach 255 iterations of the absolute value is > 4
+            } while (i < 255 && (zx * zx + zy * zy) < 4);
 
-        const color = i.toString(16);
-        context.beginPath();
-        context.rect(x, y , 1  , 1);
-        context.fillStyle = palette[i];
-        context.fill();
+            const color = i.toString(16);
+            context.beginPath();
+            context.rect(x, y , 1  , 1);
+            context.fillStyle = palette[i];
+            context.fill();
+        }
     }
 }
